@@ -1,0 +1,93 @@
+<HTML xmlns:smilanim="http://www.w3.org/2001/smil-animation">
+<HEAD>
+<META name=VI60_defaultClientScript content=JavaScript>
+<META NAME="GENERATOR" Content="Microsoft Visual Studio 6.0">
+<TITLE></TITLE>
+<script language="JavaScript" src="../chronomation.js"></script>
+<script language="JavaScript" src="../iedom2e.js"></script>
+<SCRIPT ID=clientEventHandlersJS LANGUAGE=javascript>
+<!--
+
+var timer = null;
+var i = 0;
+var begin, end;
+
+function window_onload()
+{
+    /*initDOM2Events();
+    
+    var a = new chronomation.animate();
+    a.put_dur(5);
+    var b = new chronomation.animate({dur:15});
+    //b.put_dur(10);
+    var c = new chronomation.animate();
+    c.put_dur(15);
+    
+    var coll = new chronomation.collection();
+    
+    coll.add(a);
+    coll.add(b);
+    
+    alert(coll.contains(a));
+    coll.insert(c, 1)
+    coll.removeAt(0);
+    alert(coll.contains(a));
+    alert(coll.contains(b));
+    alert(coll.item(1).get_dur());
+    
+    timer = new chronomation.timer(beat, 500);
+    begin = (new Date()).getTime();
+    timer.start();*/
+    //var a = new chronomation.animate();
+    //alert(a.get_s());
+}
+
+function beat()
+{
+    if(timer) status += " " + timer.get_delta();
+    var j = 100;
+    while(j--) status += "";
+    if(++i > 10)
+    {
+        end = new Date();
+        timer.stop();
+        status += " " + (end - begin).toString();
+        status += " " + (((end - begin)/(500*11))*100).toString();
+    }
+}
+
+function ButtonRun_onclick()
+{
+    document.getElementById("DivResults").innerHTML = eval(document.getElementById("TextScript").value);
+}
+
+//-->
+</SCRIPT>
+</HEAD>
+<BODY LANGUAGE=javascript onload="return window_onload()">
+
+<div id="divM" style="position:absolute; top: 1px; left: 600px; background-color: #c1d2ee; width: 200px; height: 20px;"> 
+A Marquee
+<animate begin="0s" dur="10s" id="animateOne" repeatCount="indefinite" calcMode="linear"
+    attributeName="left" values="0px;500px;0px" attributeType="CSS" targetElement="divM"/>
+<animate begin="0s" dur="2s" id="animateTwo" repeatCount="indefinite" calcMode="linear"
+    attributeName="top" values="10px;40px;10px" attributeType="CSS"/>
+</div>
+
+<P>0 -1 1 15</P>
+<textarea rows=18 cols=80 id=TextScript>
+var as = document.getElementsByTagName("animate");
+for(var i = 0; i < as.length; i++)
+    chronomation.animate(as[i]);
+chronomation.animator.FPS_MAX = 100;
+var t = chronomation.time.now();
+var a = null;
+chronomation.animators.reset();
+while(a = chronomation.animators.next())
+    a.start(t);
+</textarea>
+<br><button id=ButtonRun LANGUAGE=javascript onclick="return ButtonRun_onclick()">Run</button><br>
+<pre><div id=DivResults style="background-color: #c1d2ee;"></div></pre>
+
+</BODY>
+</HTML>

@@ -2,7 +2,10 @@
 
 function initDOM2Events()
 {
-    var elems = document.getElementsByTagName("*");
+    if(!document.all)
+        return;
+    
+    var elems = document.all;
     for(var i = 0; i < elems.length; i++)
     {
         var el = elems[i];
@@ -10,7 +13,11 @@ function initDOM2Events()
         {
             el.addEventListener = function(type, listener, useCapture)
             {
-                el.attachEvent("on" + type, listener);
+                this.attachEvent("on" + type, listener);
+            };
+            el.removeEventListener = function(type, listener, useCapture)
+            {
+                this.detachEvent("on" + type, listener);
             };
         }
     }

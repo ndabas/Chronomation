@@ -1,0 +1,43 @@
+<html>
+<head>
+<title>Events test</title>
+<script type="text/javascript" src="iedom2e.js"></script>
+<script type="text/javascript" defer="defer">
+
+function body_onload()
+{
+    initDOM2Events();
+
+    var d1 = document.getElementById("divOne");
+    var d2 = document.getElementById("divTwo");
+
+    d1.addEventListener("click", handlerOne, false);
+    d1.addEventListener("click", handlerTwo, false);
+    d2.addEventListener("click", handlerOne, false);
+    d2.addEventListener("click", handlerTwo, false);
+}
+function handlerOne()
+{
+    alert("Handler 1 called.");
+}
+
+function handlerTwo()
+{
+    alert("Handler 2 called.");
+}
+
+</script>
+<style type="text/css">
+
+div { height: 100px; width: 100px; background-color: #00c;
+  border: 1px solid #000; margin: 10px; }
+
+</style>
+</head>
+<body onload="return body_onload();">
+
+<div id="divOne"></div>
+<div id="divTwo"></div>
+
+</body>
+</html>

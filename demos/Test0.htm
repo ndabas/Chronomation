@@ -1,0 +1,44 @@
+<html xmlns:cm= "http://www.w3.org/2001/smil-animation">
+<head>
+<script type="text/javascript" src="../chronomation.js"></script>
+<script type="text/javascript">
+
+function cmStart()
+{
+    var as = document.getElementsByTagName("cm:animate");
+    if(!as.length)
+        as = document.getElementsByTagName("animate");
+    for(var i = 0; i < as.length; i++)
+        chronomation.animate(as[i]);
+    chronomation.animator.FPS_MAX = 100;
+    var t = chronomation.time.now();
+    var a = null;
+    chronomation.animators.reset();
+    while(a = chronomation.animators.next())
+        a.start(t);
+}
+
+</script>
+<style type="text/css">
+.marquee {
+    top: 10px;
+    left: 10px;
+    color: #fff;
+    position: absolute;
+    background-color: #3366cc;
+    padding: 10px;
+    font-family: Trebuchet MS, Arial, Helvetica, sans-serif;
+    font-weight: bold;
+}
+</style>
+</head>
+<body onload="cmStart();">
+    <div class="marquee">
+        Hello, World!
+        <cm:animate begin="0s" dur="10s" repeatCount="indefinite" calcMode="paced"
+            attributeName="left" values="10px;600px;10px" attributeType="CSS"></cm:animate>
+        <cm:animate begin="0s" end="10s" dur="20s" repeatCount="indefinite" calcMode="linear"
+            attributeName="top" values="10px;300px;10px" attributeType="CSS"></cm:animate>
+    </div>
+</body>
+</html>
