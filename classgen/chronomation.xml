@@ -1,0 +1,366 @@
+<?xml version="1.0"?>
+<objects ns="chronomation">
+    
+    <object name="timer">
+        
+        <!-- timer interval -->
+        <property name="delay"><get /><set /></property>
+        
+        <!-- difference from timer interval -->
+        <property name="delta"><get /></property>
+        
+        <!-- function to call -->
+        <property name="fn"><get /><set /></property>
+        
+        <method name="start" />
+        <method name="stop" />
+        <method name="tick" />
+        
+    </object>
+    
+    <object name="collection">
+        
+        <property name="length"><get /></property>
+        
+        <method name="add" params="item"/>
+        <method name="clear" />
+        <method name="contains" params="item" />
+        <method name="insert" params="item, index" />
+        <method name="item" params="index" />
+        <method name="remove" params="item" />
+        <method name="removeAt" params="index" />
+        
+    </object>
+    
+    <object name="animate">
+        
+        <!-- The SMIL 2.0 Animation Modules -->
+        <property name="attributeName"><get /><set /></property>
+        <property name="targetElement"><get /><set /></property>
+        <property name="from"><get /><set /></property>
+        <property name="to"><get /><set /></property>
+        <property name="by"><get /><set /></property>
+        <property name="values"><get /><set /></property>
+        <property name="calcMode"><get /><set /></property>
+        <property name="accumulate"><get /><set /></property>
+        <property name="additive"><get /><set /></property>
+        <property name="keyTimes"><get /><set /></property>
+        <property name="keySplines"><get /><set /></property>
+        
+        <!-- The SMIL 2.0 Timing and Synchronization Module -->
+        <property name="begin"><get /><set /></property>
+        <property name="end"><get /><set /></property>
+        <property name="dur"><get /><set /></property>
+        <property name="fill"><get /><set /></property>
+        <property name="repeatCount"><get /><set /></property>
+        <property name="repeatDur"><get /><set /></property>
+        <property name="restart"><get /><set /></property>
+        
+        <!-- The SMIL 2.0 Time Manipulations Module -->
+        <property name="accelerate"><get /><set /></property>
+        <property name="decelerate"><get /><set /></property>
+        <property name="autoReverse"><get /><set /></property>
+        <property name="speed"><get /><set /></property>
+        
+        <property name="timeContainer"><get /><set /></property>
+        <property name="timeParent"><get /></property>
+        
+        <!-- DOM Methods -->
+        <!-- method name="activeTimeToParentTime" params="" />
+        <method name="activeTimeToSegmentTime" params="" / -->
+        <method name="beginElement" params="" />
+        <method name="beginElementAt" params="offset" />
+        <!-- method name="documentTimeToParentTime" params="" / -->
+        <method name="endElement" params="" />
+        <method name="endElementAt" params="offset" />
+        <!-- method name="parentTimeToActiveTime" params="" />
+        <method name="parentTimeToDocumentTime" params="" / -->
+        <method name="pauseElement" params="" />
+        <!-- method name="resetElement" params="" / -->
+        <method name="resumeElement" params="" />
+        <!-- method name="seekActiveTime" params="" />
+        <method name="seekSegmentTime" params="" />
+        <method name="seekTo" params="" />
+        <method name="segmentTimeToActiveTime" params="" />
+        <method name="segmentTimeToSimpleTime" params="" />
+        <method name="simpleTimeToSegmentTime" params="" / -->
+        
+    </object>
+    
+    <object name="animateColor">
+        
+        <!-- The SMIL 2.0 Animation Modules -->
+        <property name="attributeName"><get /><set /></property>
+        <property name="targetElement"><get /><set /></property>
+        <property name="from"><get /><set /></property>
+        <property name="to"><get /><set /></property>
+        <property name="by"><get /><set /></property>
+        <property name="values"><get /><set /></property>
+        <property name="calcMode"><get /><set /></property>
+        <property name="accumulate"><get /><set /></property>
+        <property name="additive"><get /><set /></property>
+        <property name="keyTimes"><get /><set /></property>
+        <property name="keySplines"><get /><set /></property>
+        
+        <!-- The SMIL 2.0 Timing and Synchronization Module -->
+        <property name="begin"><get /><set /></property>
+        <property name="end"><get /><set /></property>
+        <property name="dur"><get /><set /></property>
+        <property name="fill"><get /><set /></property>
+        <property name="repeatCount"><get /><set /></property>
+        <property name="repeatDur"><get /><set /></property>
+        <property name="restart"><get /><set /></property>
+        
+        <!-- The SMIL 2.0 Time Manipulations Module -->
+        <property name="accelerate"><get /><set /></property>
+        <property name="decelerate"><get /><set /></property>
+        <property name="autoReverse"><get /><set /></property>
+        <property name="speed"><get /><set /></property>
+        
+        <property name="timeContainer"><get /><set /></property>
+        <property name="timeParent"><get /></property>
+        
+        <!-- DOM Methods -->
+        <method name="beginElement" params="" />
+        <method name="beginElementAt" params="offset" />
+        <method name="endElement" params="" />
+        <method name="endElementAt" params="offset" />
+        <method name="pauseElement" params="" />
+        <method name="resumeElement" params="" />
+        
+    </object>
+    
+    <object name="animateMotion">
+        
+        <!-- The SMIL 2.0 Animation Modules -->
+        <property name="targetElement"><get /><set /></property>
+        <property name="from"><get /><set /></property>
+        <property name="to"><get /><set /></property>
+        <property name="by"><get /><set /></property>
+        <property name="values"><get /><set /></property>
+        <property name="calcMode"><get /><set /></property>
+        <property name="accumulate"><get /><set /></property>
+        <property name="additive"><get /><set /></property>
+        <property name="keyTimes"><get /><set /></property>
+        <property name="keySplines"><get /><set /></property>
+        <property name="path"><get /><set /></property>
+        <property name="origin"><get /><set /></property>
+        
+        <!-- The SMIL 2.0 Timing and Synchronization Module -->
+        <property name="begin"><get /><set /></property>
+        <property name="end"><get /><set /></property>
+        <property name="dur"><get /><set /></property>
+        <property name="fill"><get /><set /></property>
+        <property name="repeatCount"><get /><set /></property>
+        <property name="repeatDur"><get /><set /></property>
+        <property name="restart"><get /><set /></property>
+        
+        <!-- The SMIL 2.0 Time Manipulations Module -->
+        <property name="accelerate"><get /><set /></property>
+        <property name="decelerate"><get /><set /></property>
+        <property name="autoReverse"><get /><set /></property>
+        <property name="speed"><get /><set /></property>
+        
+        <property name="timeContainer"><get /><set /></property>
+        <property name="timeParent"><get /></property>
+        
+        <!-- DOM Methods -->
+        <method name="beginElement" params="" />
+        <method name="beginElementAt" params="offset" />
+        <method name="endElement" params="" />
+        <method name="endElementAt" params="offset" />
+        <method name="pauseElement" params="" />
+        <method name="resumeElement" params="" />
+        
+    </object>
+    
+    <object name="set">
+        
+        <!-- The SMIL 2.0 Animation Modules -->
+        <property name="attributeName"><get /><set /></property>
+        <property name="targetElement"><get /><set /></property>
+        <property name="to"><get /><set /></property>
+        
+        <!-- The SMIL 2.0 Timing and Synchronization Module -->
+        <property name="begin"><get /><set /></property>
+        <property name="end"><get /><set /></property>
+        <property name="dur"><get /><set /></property>
+        <property name="fill"><get /><set /></property>
+        <property name="repeatDur"><get /><set /></property>
+        <property name="restart"><get /><set /></property>
+        
+        <!-- The SMIL 2.0 Time Manipulations Module -->
+        <property name="autoReverse"><get /><set /></property>
+        
+        <property name="timeContainer"><get /><set /></property>
+        <property name="timeParent"><get /></property>
+        
+        <!-- DOM Methods -->
+        <method name="beginElement" params="" />
+        <method name="beginElementAt" params="offset" />
+        <method name="endElement" params="" />
+        <method name="endElementAt" params="offset" />
+        <method name="pauseElement" params="" />
+        <method name="resumeElement" params="" />
+        
+    </object>
+    
+    <object name="excl">
+        
+        <!-- The SMIL 2.0 Timing and Synchronization Module -->
+        <property name="dur"><get /><set /></property>
+        <property name="repeatDur"><get /><set /></property>
+        <property name="endsync"><get /><set /></property>
+        <property name="syncBehavior"><get /><set /></property>
+        <property name="syncTolerance"><get /><set /></property>
+        
+        <!-- The SMIL 2.0 Time Manipulations Module -->
+        <property name="accelerate"><get /><set /></property>
+        <property name="decelerate"><get /><set /></property>
+        <property name="autoReverse"><get /><set /></property>
+        
+        <property name="activeElements"><get /></property>
+        <property name="timeAll"><get /></property>
+        <property name="timeChildren"><get /></property>
+        
+        <!-- DOM Methods -->
+        <method name="beginElement" params="" />
+        <method name="endElement" params="" />
+        
+    </object>
+    
+    <object name="priorityClass">
+        
+        <property name="higher"><get /><set /></property>
+        <property name="lower"><get /><set /></property>
+        <property name="peers"><get /><set /></property>
+        
+    </object>
+    
+    <object name="par">
+        
+        <!-- The SMIL 2.0 Timing and Synchronization Module -->
+        <property name="dur"><get /><set /></property>
+        <property name="fill"><get /><set /></property>
+        <property name="repeatCount"><get /><set /></property>
+        <property name="repeatDur"><get /><set /></property>
+        <property name="restart"><get /><set /></property>
+        <property name="endsync"><get /><set /></property>
+        <property name="syncBehavior"><get /><set /></property>
+        <property name="syncTolerance"><get /><set /></property>
+        
+        <!-- The SMIL 2.0 Time Manipulations Module -->
+        <property name="accelerate"><get /><set /></property>
+        <property name="decelerate"><get /><set /></property>
+        <property name="autoReverse"><get /><set /></property>
+        <property name="speed"><get /><set /></property>
+        
+        <property name="timeAction"><get /><set /></property>
+        <property name="timeParent"><get /></property>
+        
+        <property name="activeElements"><get /></property>
+        <property name="timeAll"><get /></property>
+        <property name="timeChildren"><get /></property>
+        
+        <!-- DOM Methods -->
+        <method name="beginElement" params="" />
+        <method name="beginElementAt" params="offset" />
+        <method name="endElement" params="" />
+        <method name="endElementAt" params="offset" />
+        <method name="pauseElement" params="" />
+        <method name="resumeElement" params="" />
+        
+    </object>
+    
+    <object name="seq">
+        
+        <!-- The SMIL 2.0 Timing and Synchronization Module -->
+        <property name="begin"><get /><set /></property>
+        <property name="end"><get /><set /></property>
+        <property name="dur"><get /><set /></property>
+        <property name="fill"><get /><set /></property>
+        <property name="repeatCount"><get /><set /></property>
+        <property name="repeatDur"><get /><set /></property>
+        <property name="restart"><get /><set /></property>
+        <property name="syncBehavior"><get /><set /></property>
+        <property name="syncTolerance"><get /><set /></property>
+        
+        <!-- The SMIL 2.0 Time Manipulations Module -->
+        <property name="accelerate"><get /><set /></property>
+        <property name="decelerate"><get /><set /></property>
+        <property name="autoReverse"><get /><set /></property>
+        <property name="speed"><get /><set /></property>
+        
+        <property name="timeAction"><get /><set /></property>
+        <property name="timeContainer"><get /><set /></property>
+        <property name="timeParent"><get /></property>
+        
+        <property name="activeElements"><get /></property>
+        <property name="timeAll"><get /></property>
+        <property name="timeChildren"><get /></property>
+        
+        <!-- DOM Methods -->
+        <method name="beginElement" params="" />
+        <method name="beginElementAt" params="offset" />
+        <method name="endElement" params="" />
+        <method name="endElementAt" params="offset" />
+        <method name="pauseElement" params="" />
+        <method name="resumeElement" params="" />
+        
+    </object>
+    
+    <object name="time2">
+        
+        <!-- The SMIL 2.0 Timing and Synchronization Module -->
+        <property name="begin"><get /><set /></property>
+        <property name="end"><get /><set /></property>
+        <property name="dur"><get /><set /></property>
+        <property name="fill"><get /><set /></property>
+        <property name="repeatCount"><get /><set /></property>
+        <property name="repeatDur"><get /><set /></property>
+        <property name="restart"><get /><set /></property>
+        <property name="syncBehavior"><get /><set /></property>
+        <property name="syncTolerance"><get /><set /></property>
+        
+        <!-- The SMIL 2.0 Time Manipulations Module -->
+        <property name="accelerate"><get /><set /></property>
+        <property name="decelerate"><get /><set /></property>
+        <property name="autoReverse"><get /><set /></property>
+        <property name="speed"><get /><set /></property>
+        
+        <property name="timeAction"><get /><set /></property>
+        <property name="timeContainer"><get /><set /></property>
+        <property name="timeParent"><get /></property>
+        
+        <!-- DOM Methods -->
+        <method name="beginElement" params="" />
+        <method name="beginElementAt" params="offset" />
+        <method name="endElement" params="" />
+        <method name="endElementAt" params="offset" />
+        <method name="pauseElement" params="" />
+        <method name="resumeElement" params="" />
+        
+    </object>
+    
+    <!-- object name="currTimeState">
+        
+        <property name="activeDur"><get /></property>
+        <property name="activeTime"><get /></property>
+        <property name="isActive"><get /></property>
+        <property name="isOn"><get /></property>
+        <property name="isPaused"><get /></property>
+        <property name="parentTimeBegin"><get /></property>
+        <property name="parentTimeEnd"><get /></property>
+        <property name="progress"><get /></property>
+        <property name="repeatCount"><get /></property>
+        <property name="segmentDur"><get /></property>
+        <property name="segmentTime"><get /></property>
+        <property name="simpleDur"><get /></property>
+        <property name="simpleTime"><get /></property>
+        <property name="speed"><get /></property>
+        <property name="state"><get /></property>
+        <property name="stateString"><get /></property>
+        
+    </object -->
+    
+</objects>
