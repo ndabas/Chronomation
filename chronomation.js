@@ -2,21 +2,6 @@
 
 var chronomation = new Object();
 
-/*
-
-var l = new chronomation.listParser(";");
-var time1 = (new Date()).getTime();
-var a = l.parse(" 0 \r \n 1 9 ; \r 2 7 8\t\t;  1   9   7\t\t");
-var time2 = (new Date()).getTime();
-var s = "";
-for(var i = 0; i < a.length; i++)
-    for(var j = 0; j < a[i].length; j++)
-        s += " " + a[i].charCodeAt(j);
-s += "\n" + a;
-s += "\nTime: " + (time2 - time1).toString();
-
-*/
-
 chronomation.listParser = function(separator)
 {
     this.separator = separator;
@@ -24,12 +9,17 @@ chronomation.listParser = function(separator)
     
     this.parse = function(text)
     {
-        text = text.replace(/\s+/g, " ");
+        this.all = new Array();
+        if(text == null)
+            return null;
+        
+        text = text.toString().replace(/\s+/g, " ");
         text = text.replace(
             new RegExp(" ?" + this.separator + " ?", "g"),
-            this.separator);
+            this.separator
+        );
         text = text.replace(/^ | $/g, "");
-        return this.all = text.split(this.separator);
+        return this.all = this.all.concat(text.split(this.separator));
     };
 };
 
@@ -149,40 +139,39 @@ chronomation.time = new Object();
 chronomation.time.parseOffsetTimeValue = function(value)
 {
     var values = null;
+    var time = null;
+    
+    if(values = value.match(/^([\+\-])?((?:[0-9]+:)?[0-9]{2}:[0-9]{2}(?:\.[0-9]+)?|[0-9]+(?:\.[0-9]+)?(?:h|min|s|ms)?)$/))
+        if(time = chronomation.time.parseClockValue(values[2]))
+            if(values[1] == "-")
+                time *= -1;
+    
+    return time;
+};
+
+chronomation.time.parseClockValue = function(value)
+{
+    var values = null;
     var time = 0;
     
     value = value.replace(/ /g, "");
     
-    // Full clock value
-    if(values = value.match(/^([\+\-]?)([0-9]+):([0-9]{2}):([0-9]{2})(\.[0-9]+)?$/))
+    // Full clock value or partial clock value
+    if(values = value.match(/^(?:([0-9]+):)?([0-9]{2}):([0-9]{2})(\.[0-9]+)?$/))
     {
-        time += parseInt(values[2], 10) * 60 * 60 * 1000;
-        time += parseInt(values[3], 10) * 60 * 1000;
-        time += parseInt(values[4], 10) * 1000;
-        time += values[5].length ? (parseFloat(values[5]) * 1000) : 0;
-        if(values[1] == "-")
-            time *= -1;
+        time += values[1] ? (parseInt(values[1], 10) * 60 * 60 * 1000) : 0;
+        time += parseInt(values[2], 10) * 60 * 1000;
+        time += parseInt(values[3], 10) * 1000;
+        time += values[4] ? (parseFloat(values[4]) * 1000) : 0;
         
         return time;
     }
     
-    // Partial clock value
-    if(values = value.match(/^([\+\-]?)([0-9]{2}):([0-9]{2})(\.[0-9]+)?$/))
-    {
-        time += parseInt(values[2], 10) * 60 * 1000;
-        time += parseInt(values[3], 10) * 1000;
-        time += values[4].length ? (parseFloat(values[4]) * 1000) : 0;
-        if(values[1] == "-")
-            time *= -1;
-            
-        return time;
-    }
-    
     // Timecount value
-    if(values = value.match(/^([\+\-]?)([0-9]+)(\.[0-9]+)?(h|min|s|ms)?$/))
+    if(values = value.match(/^([0-9]+)(\.[0-9]+)?(h|min|s|ms)?$/))
     {
         var mul = 1;
-        switch(values[4])
+        switch(values[3])
         {
             case "h":
                 mul *= 60;
@@ -196,12 +185,10 @@ chronomation.time.parseOffsetTimeValue = function(value)
                 mul = 1000;
         }
         
-        time += parseInt(values[2], 10);
-        time += values[3].length ? parseFloat(values[3]) : 0;
+        time += parseInt(values[1], 10);
+        time += values[2].length ? parseFloat(values[2]) : 0;
         time *= mul;
-        if(values[1] == "-")
-            time *= -1;
-        
+
         return time;
     }
     
@@ -219,13 +206,13 @@ chronomation.time.parseWallclockSyncValue = function(value)
     {
         var d = new Date();
         time = Date.UTC(
-            (values[2].length ? parseInt(values[2], 10) : d.getUTCFullYear()),
-            (values[3].length ? (parseInt(values[3], 10) - 1) : d.getUTCMonth()),
-            (values[4].length ? parseInt(values[4], 10) : d.getUTCDate()),
+            (values[2] ? parseInt(values[2], 10) : d.getUTCFullYear()),
+            (values[3] ? (parseInt(values[3], 10) - 1) : d.getUTCMonth()),
+            (values[4] ? parseInt(values[4], 10) : d.getUTCDate()),
             parseInt(values[5], 10),
             parseInt(values[6], 10),
-            (values[8].length ? parseInt(values[8], 10) : 0),
-            (values[9].length ? (parseFloat(values[9]) * 1000) : 0)
+            (values[8] ? parseInt(values[8], 10) : 0),
+            (values[9] ? (parseFloat(values[9]) * 1000) : 0)
         );
         
         if(values[10].length)
@@ -255,188 +242,27 @@ chronomation.time.parseWallclockSyncValue = function(value)
     }
     
     return null;
-}
+};
 
-/*
-
-var t = new chronomation.timeline(notified);
-t.add(1000, "1 second");
-t.add(1500, "1.5 second");
-t.add(2000, "2 seconds");
-t.FPS = 100;
-t.start();
-status = "";
-
-function notified(cookie)
+chronomation.time.now = function()
 {
-    status += " " + (new Date()).getTime().toString() + " " + cookie;
-}
+    return (new Date()).getTime();
+};
 
-*/
+chronomation.time.timers = new chronomation.collection();
 
-chronomation.timelines = new chronomation.collection();
-
-chronomation.timeline = function(notifyFn)
+chronomation.time.setTimeout = function(notifyFn, msecs)
 {
-    var absoluteTimes = new Array();
+    if(typeof(notifyFn) != "function")
+        return false;
     
-    this.all = new Array();
-    this.fps = 12;
-    this.offset = Infinity;
-    this.onnotify = (typeof(notifyFn) == "function") ? notifyFn : null;
+    chronomation.time.timers.add(notifyFn);
+    var indexStr = chronomation.time.timers.contains(notifyFn).toString();
+    var expr = "chronomation.time.timers.item(";
+    expr = expr.concat(indexStr, ")(", chronomation.time.now() + msecs, ");");
     
-    var timerCookie = null;
-    
-    this.add = function(time, cookie)
-    {
-        var el = new Object();
-        el["time"] = time;
-        el["cookie"] = cookie;
-        
-        this.all.push(el);
-        
-        return true;
-    };
-    
-    this.build = function(elementNode)
-    {
-        function processList(list, typeDesc)
-        {
-            for(var i = 0; i < list.length; i++)
-            {
-                var value = null;
-                
-                if(list[i].match(/^indefinite$/))
-                    continue;
-                
-                if(value = chronomation.time.parseOffsetTimeValue(list[i]))
-                {
-                    this.add(value, typeDesc);
-                    continue;
-                }
-                
-                if(value = chronomation.time.parseWallclockSyncValue(list[i]))
-                {
-                    absoluteTimes.push({time: value, cookie: typeDesc});
-                    continue;
-                }
-                
-                unresolved.push({text: list[i], cookie: typeDesc});
-            }
-        }
-        
-        var unresolved = new Array();
-        
-        var begin = elementNode.getAttribute("begin");
-        if(begin.length == 0)
-            elementNode.setAttribute("begin", begin = "0");
-        
-        var end = elementNode.getAttribute("end");
-        if(end.length == 0)
-            elementNode.setAttribute("end", end = "indefinite");
-        
-        var beginList = (new chronomation.listParser(";")).parse(begin);
-        processList(beginList, "begin");
-        
-        var endList = (new chronomation.listParser(";")).parse(end);
-        processList(endList, "end");
-        
-        return unresolved;
-    };
-    
-    this.clear = function()
-    {
-        absoluteTimes = new Array();
-        this.all = new Array();
-        
-        return true;
-    };
-    
-    this.next = function(cookie)
-    {
-        for(var i = 0; i < this.all.length; i++)
-        {
-            if(String(this.all[i].cookie) == cookie)
-                return this.offset + this.all[i].time;
-        }
-        
-        return null;
-    };
-    
-    this.pause = function()
-    {
-        if(timerCookie == null)
-            return false;
-        
-        clearTimeout(timerCookie);
-        timerCookie = null;
-    };
-    
-    this.resume = function()
-    {
-        this.all = this.all.sort(timelineSort);
-        
-        this.tick();
-    };
-    
-    this.start = function()
-    {
-        this.all = this.all.sort(timelineSort);
-        
-        if(chronomation.timelines.add(this) == -1)
-            return false;
-        
-        this.offset = (new Date()).getTime();
-        var t = null;
-        while(t = absoluteTimes.pop())
-        {
-            this.add(t.time - this.offset, t.cookie);
-        }
-        
-        return this.tick();
-    };
-    
-    this.stop = function()
-    {
-        if(timerCookie == null)
-            return false;
-        
-        clearTimeout(timerCookie);
-        chronomation.timelines.remove(this);
-        timerCookie = null;
-        
-        return true;
-    };
-    
-    this.tick = function()
-    {
-        if(typeof(this.onnotify) != "function")
-            return false;
-        
-        var delta = 0;
-        while((this.all.length > 0)
-            && (delta = (new Date()).getTime() - this.all[0].time - this.offset) > 0)
-            this.onnotify(this.all.shift().cookie, delta);
-        
-        if(this.all.length == 0)
-        {
-            this.stop();
-            return true;
-        }
-        
-        var expr = "chronomation.timelines.item(";
-        expr += chronomation.timelines.contains(this).toString();
-        expr += ").tick();";
-        var delay = Math.round(1000 / this.fps);
-        timerCookie = setTimeout(expr, delay);
-        
-        return true;
-    };
-    
-    function timelineSort(a, b)
-    {
-        return (a.time - b.time);
-    }
+    window.setTimeout(expr, msecs);
+    return true;
 };
 
 chronomation.vector = function()
@@ -464,6 +290,9 @@ chronomation.vector = function()
     {
         this.values = new Array();
         
+        if(!(text = new String(text)))
+            return null;
+        
         var values = text.match(re);
         if(values == null)
             return null;
@@ -478,84 +307,392 @@ chronomation.vector = function()
             formatString = text.replace(re, "%N");
         }
         
-        return this.values = values;
+        return this.values = this.values.concat(values);
+    };
+    
+    this.magnitude = function()
+    {
+        var mag = 0.0;
+        for(var i = 0; i < this.values.length; i++)
+            mag += Math.pow(this.values[i], 2);
+        return Math.sqrt(mag);
     };
 };
 
-chronomation.attributeCache = function(elementNode, attributes)
-{
-    this.all = new Object();
-    this.attributes = attributes;
-    this.elementNode = elementNode;
-    
-    this.build = function()
-    {
-        for(var i = 0; i < this.attributes.length; i++)
-        {
-            this.all[this.attributes[i]] = this.elementNode.getAttrinute(this.attributes[i]);
-        }
-        
-        return true;
-    };
-    
-    this.check = function(attribute)
-    {
-        var newValue;
-        if(String(newValue = this.elementNode.getAttribute(attribute))
-            == this.all[attribute])
-            return null;
-        
-        return this.all[attribute] = newValue;
-    };
-    
-    this.clear = function()
-    {
-        this.all = new Object();
-        return true;
-    };
-};
+chronomation.animators = new chronomation.collection();
 
 chronomation.animator = function(element, tickFn)
 {
     var elementNode = element;
-    var timeline = new chronomation.timeline(timeline_onnotify);
-    var cache = new chronomation.attributeCache(elementNode,
-        new Array("begin", "dur", "end", "repeatCount", "repeatDur"));
-    cache.build();
+    var attributeName = null;
+    var attributeType = null;
+    var beginList = null;
+    var endList = null;
+    var dur = Infinity;
+    var repeatCount = null
+    var repeatDur = null;
+    var restart = null;
+    var cache = {begin: null, end: null};
+    var docStartTime = 0;
+    var simpleDurStartTime = 0;
+    var simpleDurStopTime = 0;
+    var active = false;
+    var started = false;
+    var ticker = tickFn;
     
-    var dur = elementNode.getAttribute("dur");
-    if(dur.length == 0)
-        elementNode.setAttribute("dur", dur = "indefinite");
+    chronomation.animators.add(this);
+    this.targetElement = this.from = this.to =
+        this.by = this.values = this.calcMode = null;
     
-    
-    
-    this.ontick = (typeof(tickFn) == "function") ? tickFn : null;
-    
-    function timeline_onnotify(cookie, delta)
+    this.start = function(actualStart)
     {
-        if(cache.check("begin") || cache.check("end") ||
-            cache.check("dur") || cache.check("repeatCount") ||
-            cache.check("repeatDur"))
-            buildTimeline();
+        docStartTime = actualStart;
+        readAttributes.call(this);
         
-        if(cookie == "begin")
+        processList(beginList, begin);
+        processList(endList, end);
+    };
+    
+    this.setValue = function(value)
+    {
+        var cssProp = CSSName(attributeName);
+        switch(attributeType)
         {
-            var end = null;
-            var simpleDuration = (end = timeline.next("end")) ? end : Infinity;
-            simpleDuration = Math.min(simpleDuration, dur);
+            case "CSS":
+                this.targetElement.style[cssProp] = value;
+                break;
+            case "XML":
+                this.targetElement.setAttribute(attributeName, value);
+                break;
+            case "auto":
+            default:
+                if(this.targetElement.style[cssProp] != "undefined")
+                {
+                    this.targetElement.style[cssProp] = value;
+                    break;
+                }
+                
+                this.targetElement.setAttribute(attributeName, value);
+                break;
         }
-            
+    };
+    
+    this.getValue = function()
+    {
+        var cssProp = CSSName(attributeName);
+        switch(attributeType)
+        {
+            case "CSS":
+                return this.targetElement.style[cssProp];
+            case "XML":
+                return this.targetElement.getAttribute(attributeName);
+            case "auto":
+            default:
+                var value = null;
+                if((value = this.targetElement.style[cssProp]) != "undefined")
+                    return value;
+                return this.targetElement.getAttribute(attributeName);
+        }
+    };
+    
+    function CSSName(name)
+    {
+        name = name.split("-");
+        for(var i = 1; i < name.length; i++)
+            if(name[i])
+                name[i] = name[i].charAt(0).toUpperCase()
+                    + name[i].slice(1);
+        return name.join("");
+                
     }
     
-    function buildTimeline()
+    function tick()
     {
-        var paused = timeline.pause();
-        timeline.clear();
-        var unresolved = timeline.build(elementNode);
-        if(paused)
-            timeline.resume();
+        if(!active)
+            return;
+        
+        var t = chronomation.time.now();
+        var progress = (t - simpleDurStartTime) / dur;
+        if((repeatDur || repeatCount) && progress >= 1)
+        {
+            var maxDur = Math.min(
+                repeatDur ? repeatDur : Infinity,
+                repeatCount ? (repeatCount * dur) : Infinity
+            );
+            if(((maxDur != Infinity) && (t - simpleDurStartTime < maxDur))
+                || (repeatCount == Infinity) || (repeatDur == Infinity))
+                progress -= Math.floor(progress);
+        }
+        
+        
+        if(progress <= 1)
+            chronomation.time.setTimeout(
+                tick,
+                1000 / chronomation.animator.FPS_MAX
+            );
+        else
+        {
+            progress = -1;
+            active = false;
+        }
+        
+        ticker(progress);
+    }
+    
+    function begin(actualTime)
+    {
+        if(active)
+        {
+            if(restart != "always")
+                return;
+        }
+        
+        if(started && (restart == "never"))
+            return;
+        
+        started = true;
+        active = true;
+        simpleDurStartTime = actualTime;
+        tick();
+    }
+    
+    function end(actualTime)
+    {
+        simpleDurStopTime = actualTime;
+        active = false;
+    }
+    
+    function processList(list, fn)
+    {
+        for(var i = 0; i < list.length; i++)
+        {
+            var value = null;
+            
+            if(list[i] == "indefinite")
+                continue;
+            
+            if((value = chronomation.time.parseOffsetTimeValue(list[i])) != null)
+            {
+                chronomation.time.setTimeout(
+                    fn,
+                    value - chronomation.time.now() + docStartTime
+                );
+                continue;
+            }
+            
+            if((value = chronomation.time.parseWallclockSyncValue(list[i])) != null)
+            {
+                chronomation.time.setTimeout(
+                    fn,
+                    value - chronomation.time.now()
+                );
+                continue;
+            }
+        }
+    }
+    
+    function readAttributes()
+    {
+        this.from = elementNode.getAttribute("from");
+        this.to = elementNode.getAttribute("to");
+        this.by = elementNode.getAttribute("by");
+        this.values = (new chronomation.listParser(";")).parse(
+            elementNode.getAttribute("values") );
+        
+        this.calcMode = elementNode.getAttribute("calcMode");
+        if(this.calcMode = (new String(
+            this.calcMode)).match(/^(discrete|linear|paced|spline)$/))
+            this.calcMode = this.calcMode[0];
+        else
+            this.calcMode = "linear";
+        elementNode.setAttribute("calcMode", this.calcMode);
+        
+        this.targetElement = elementNode.getAttribute("targetElement");
+        if(this.targetElement)
+            this.targetElement = document.getElementById(this.targetElement);
+        if(!this.targetElement)
+            this.targetElement = elementNode.parentNode;
+        
+        var begin = elementNode.getAttribute("begin");
+        if(!begin)
+            elementNode.setAttribute("begin", begin = "0");
+        
+        var end = elementNode.getAttribute("end");
+        if(!end)
+            elementNode.setAttribute("end", end = "indefinite");
+        
+        dur = elementNode.getAttribute("dur");
+        if(!dur)
+            elementNode.setAttribute("dur", dur = "indefinite");
+        
+        repeatCount = elementNode.getAttribute("repeatCount");
+        repeatDur = elementNode.getAttribute("repeatDur");
+        
+        restart = elementNode.getAttribute("restart");
+        if(restart =
+            (new String(restart)).match(/^(always|whenNotActive|never)$/))
+            restart = restart[0];
+        else
+            restart = "always";
+        elementNode.setAttribute("restart", restart);
+        
+        attributeName = elementNode.getAttribute("attributeName");
+        attributeType = elementNode.getAttribute("attributeType");
+        if(attributeType =
+            (new String(attributeType)).match(/^(CSS|XML|auto)$/))
+            attributeType = attributeType[0];
+        else
+            attributeType = "auto";
+        elementNode.setAttribute("attributeType", attributeType);
+        
+        beginList = (new chronomation.listParser(";")).parse(cache.begin = begin);
+        endList = (new chronomation.listParser(";")).parse(cache.end = end);
+        dur = (dur == "indefinite") ?
+            Infinity : chronomation.time.parseClockValue(dur);
+        
+        if(isNaN(dur))
+            dur = Infinity;
+        if(repeatCount)
+            repeatCount = (repeatCount == "indefinite") ?
+                Infinity : parseFloat(repeatCount);
+        if(isNaN(repeatCount))
+            repeatCount = null;
+        if(repeatDur)
+            repeatDur = (repeatDur == "indefinite") ?
+                Infinity : chronomation.time.parseClockValue(repeatDur);
     }
 };
 
+chronomation.animator.FPS_MAX = 12;
+
+/*
+
+chronomation.animate(document.getElementById("animateOne"));
+chronomation.animate(document.getElementById("animateTwo"));
+chronomation.animator.FPS_MAX = 100;
+var t = chronomation.time.now();
+var a = null;
+while(a = chronomation.animators.next())
+    a.start(t);
+
+var as = document.getElementsByTagName("animate");
+for(var i = 0; i < as.length; i++)
+    chronomation.animate(as[i]);
+chronomation.animator.FPS_MAX = 100;
+var t = chronomation.time.now();
+var a = null;
+chronomation.animators.reset();
+while(a = chronomation.animators.next())
+    a.start(t);
+
+*/
+
+chronomation.animate = function(element)
+{
+    var elementNode = element;
+    var controller = new chronomation.animator(elementNode, ticker);
+    var firstVector = new chronomation.vector();
+    var lastVector = new chronomation.vector();
+    var currentValues = new Array();
+    
+    function ticker(progress)
+    {
+        var delta = false;
+        
+        if(progress == -1)
+            return;
+        
+        if(controller.values && controller.values.length
+            && controller.values[0].length)
+        {
+            if(controller.calcMode == "linear")
+            {
+                if(controller.values.length <= first + 1)
+                    return;
+                
+                var first = Math.floor((controller.values.length - 1) * progress);
+                firstVector.parse(controller.values[first], true);
+                lastVector.parse(controller.values[first + 1], false);
+                progress *= controller.values.length - 1;
+                progress -= Math.floor(progress);
+            }
+            if(controller.calcMode == "paced")
+            {
+                var l = controller.values.length - 1;
+                var range = 0;
+                var distances = new Array();
+                for(var i = 0; i < l; i++)
+                {
+                    firstVector.parse(controller.values[i], false);
+                    lastVector.parse(controller.values[i + 1], false);
+                    distances[i] = range += Math.abs(
+                        lastVector.magnitude() - firstVector.magnitude() );
+                }
+                for(var i = 0; i < l; i++)
+                {
+                    if((distances[i] / range) >= progress)
+                    {
+                        firstVector.parse(controller.values[i], true);
+                        lastVector.parse(controller.values[i + 1], false);
+                        
+                        var prevDistance = i ? distances[i - 1] : 0;
+                        progress = (progress * range - prevDistance) /
+                            (distances[i] - prevDistance);
+                        break;
+                    }
+                }
+                
+            }
+            if(controller.calcMode == "discrete")
+            {
+                var i = Math.round(controller.values.length * progress);
+                firstVector.parse(controller.values[i], true);
+                lastVector.parse(controller.values[i], false);
+            }
+            
+            var n = firstVector.values.length;
+            if(n != lastVector.values.length)
+                return;
+        
+            for(var i = 0; i < n; i++)
+            {
+                currentValues[i] = firstVector.values[i] +
+                    (lastVector.values[i] - firstVector.values[i]) * progress;
+            }
+        }
+        else
+        {
+            firstVector.parse(
+                controller.from ? controller.from : controller.getValue(),
+                true
+            );
+        
+            lastVector.parse(
+                controller.to ? controller.to : (delta = true, controller.by),
+                false
+            );
+            
+            var n = firstVector.values.length;
+            if(n != lastVector.values.length)
+                return;
+        
+            if(controller.calcMode.match(/^(linear|paced)$/))
+                for(var i = 0; i < n; i++)
+                {
+                    currentValues[i] = firstVector.values[i] +
+                        (lastVector.values[i] -
+                        (delta ? 0 : firstVector.values[i])) * progress;
+                }
+            if(controller.calcMode == "discrete")
+                for(var i = 0; i < n; i++)
+                {
+                    currentValues[i] = Math.round(progress) ?
+                        lastVector.values[i] : firstVector.values[i];
+                }
+        }
+        
+        controller.setValue(firstVector.format(currentValues));
+    }
+};
 
 //</script>
