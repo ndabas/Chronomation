@@ -1,13 +1,183 @@
-
+// Requires ECMA-262 3rd Edition.
+// 
+// Chronomation classes working set.
 //<script language="JScript">
 
 var chronomation = new Object();
 
-chronomation.timer = function()
+chronomation.dataTypes = new Object();
+
+chronomation.dataTypes.integer = function(value)
+{
+    return (Math.round(new Number(value)))
+};
+
+chronomation.dataTypes.number = function(value)
+{
+    return (new Number(value));
+};
+
+chronomation.dataTypes.bool = function(value)
+{
+    if(typeof(value) == "boolean")
+        return value;
+    
+    if(typeof(value) == "number")
+        return new Boolean(value != 0);
+    
+    value = value.toString().toLowerCase();
+    switch(value)
+    {
+        case "true":
+        case "yes":
+        case "on":
+            return true;
+        default:
+            return false;
+    }
+};
+
+chronomation.dataTypes.enumeration = function(value, types)
+{
+    value = value.toString().toLowerCase();
+    for(var i = 0; i < types.length; i++)
+    {
+        if(types[i].toString().toLowerCase() == value)
+            return types[i];
+    }
+    
+    return null;
+};
+
+chronomation.collection = function()
+{
+    var all = new Array();
+    var iteratorIndex = 0;
+    
+    this.get_length = function()
+    {
+        return all.length;
+    };
+    
+    this.add = function(item)
+    {
+        if(item == null)
+            return -1;
+        
+        if(this.contains(item) != -1)
+            return -1;
+        
+        return (all.push(item) - 1);
+    };
+    
+    this.clear = function()
+    {
+        all = new Array();
+        return true;
+    };
+    
+    this.contains = function(item)
+    {
+        for(var i = 0; i < all.length; i++)
+        {
+            if(all[i] == item)
+                return i;
+        }
+        
+        return -1;
+    };
+    
+    this.insert = function(item, index)
+    {
+        index = chronomation.dataTypes.integer(index);
+        if(isNaN(index))
+            return false;
+        
+        if((index < 0) || (index > all.length))
+            return false;
+        
+        if(item == null)
+            return false;
+        
+        if(this.contains(item) != -1)
+            return false;
+        
+        var part = all.splice(index, all.length - index, item);
+        if(part.length)
+            all = all.concat(part);
+        
+        return true;
+    };
+    
+    this.item = function(index)
+    {
+        index = chronomation.dataTypes.integer(index);
+        if(isNaN(index))
+            return null;
+        
+        if((index < 0) || (index >= all.length))
+            return null;
+        
+        return all[index];
+    };
+    
+    this.next = function()
+    {
+        if(iteratorIndex >= all.length)
+        {
+            return null;
+        }
+        
+        return all[iteratorIndex++];
+    };
+    
+    this.remove = function(item)
+    {
+        for(var i = 0; i < all.length; i++)
+        {
+            if(all[i] == item)
+            {
+                return this.removeAt(i) == item ? i : -1;
+            }
+        }
+        
+        return -1;
+    };
+    
+    this.removeAt = function(index)
+    {
+        index = chronomation.dataTypes.integer(index);
+        if(isNaN(index))
+            return null;
+        
+        if((index < 0) || (index >= all.length))
+            return null;
+        
+        var part = all.splice(index + 1, all.length - index - 1);
+        var item = all.pop();
+        if(part.length)
+            all = all.concat(part);
+        
+        return item;
+    };
+    
+    this.reset = function()
+    {
+        iteratorIndex = 0;
+    };
+    
+};
+
+chronomation.timers = new chronomation.collection();
+
+chronomation.timer = function(func, msecs)
 {
     var delay = null;
     var delta = null;
     var fn = null;
+    
+    var cookie = null;
+    var last = null;
     
     this.get_delay = function()
     {
@@ -16,7 +186,7 @@ chronomation.timer = function()
     
     this.put_delay = function(value)
     {
-        delay = value;
+        delay = chronomation.dataTypes.integer(value);
     };
     
     this.get_delta = function()
@@ -31,73 +201,60 @@ chronomation.timer = function()
     
     this.put_fn = function(value)
     {
-        fn = value;
+        fn = (typeof(value) == "function") ? value : null;
     };
     
     this.start = function()
     {
+        if(fn == null || delay == null)
+            return false;
         
+        if(chronomation.timers.add(this) == -1)
+            return false;
+        
+        var expr = "chronomation.timers.item(";
+        expr += chronomation.timers.contains(this).toString();
+        expr += ").tick();";
+        
+        cookie = setTimeout(expr, delay);
+        last = (new Date()).getTime();
+        
+        return true;
     };
     
     this.stop = function()
     {
+        if(cookie)
+        {
+            clearTimeout(cookie);
+            cookie = null;
+            if(chronomation.timers.remove(this) == -1)
+                return false;
+            
+            return true;
+        }
         
+        return false;
     };
     
     this.tick = function()
     {
+        var expr = "chronomation.timers.item(";
+        expr += chronomation.timers.contains(this).toString();
+        expr += ").tick();";
         
+        delta = (new Date()).getTime() - last - delay;
+        last = (new Date()).getTime();
+        cookie = setTimeout(expr, delay - Math.round(delta / 2));
+        fn();
     };
+    
+    this.put_fn(func);
+    this.put_delay(msecs);
     
 };
 
-chronomation.collection = function()
-{
-    var length = null;
-    
-    this.get_length = function()
-    {
-        return length;
-    };
-    
-    this.add = function(item)
-    {
-        
-    };
-    
-    this.clear = function()
-    {
-        
-    };
-    
-    this.contains = function(item)
-    {
-        
-    };
-    
-    this.insert = function(item, index)
-    {
-        
-    };
-    
-    this.item = function(index)
-    {
-        
-    };
-    
-    this.remove = function(item)
-    {
-        
-    };
-    
-    this.removeAt = function(index)
-    {
-        
-    };
-    
-};
-
-chronomation.animate = function()
+chronomation.animate = function(attributes)
 {
     var accelerate = null;
     var accumulate = null;
@@ -389,9 +546,20 @@ chronomation.animate = function()
         
     };
     
+    if(typeof(attributes) == "object")
+    {
+        for(key in attributes)
+        {
+            if(typeof(this["put_" + key]) == "function")
+            {
+                this["put_" + key](attributes[key]);
+            }
+        }
+    }
+    
 };
 
-chronomation.animateColor = function()
+chronomation.animateColor = function(attributes)
 {
     var accelerate = null;
     var accumulate = null;
@@ -683,9 +851,20 @@ chronomation.animateColor = function()
         
     };
     
+    if(typeof(attributes) == "object")
+    {
+        for(key in attributes)
+        {
+            if(typeof(this["put_" + key]) == "function")
+            {
+                this["put_" + key](attributes[key]);
+            }
+        }
+    }
+    
 };
 
-chronomation.animateMotion = function()
+chronomation.animateMotion = function(attributes)
 {
     var accelerate = null;
     var accumulate = null;
@@ -988,9 +1167,20 @@ chronomation.animateMotion = function()
         
     };
     
+    if(typeof(attributes) == "object")
+    {
+        for(key in attributes)
+        {
+            if(typeof(this["put_" + key]) == "function")
+            {
+                this["put_" + key](attributes[key]);
+            }
+        }
+    }
+    
 };
 
-chronomation.set = function()
+chronomation.set = function(attributes)
 {
     var attributeName = null;
     var autoReverse = null;
@@ -1150,9 +1340,20 @@ chronomation.set = function()
         
     };
     
+    if(typeof(attributes) == "object")
+    {
+        for(key in attributes)
+        {
+            if(typeof(this["put_" + key]) == "function")
+            {
+                this["put_" + key](attributes[key]);
+            }
+        }
+    }
+    
 };
 
-chronomation.excl = function()
+chronomation.excl = function(attributes)
 {
     var accelerate = null;
     var activeElements = null;
@@ -1271,9 +1472,20 @@ chronomation.excl = function()
         
     };
     
+    if(typeof(attributes) == "object")
+    {
+        for(key in attributes)
+        {
+            if(typeof(this["put_" + key]) == "function")
+            {
+                this["put_" + key](attributes[key]);
+            }
+        }
+    }
+    
 };
 
-chronomation.priorityClass = function()
+chronomation.priorityClass = function(attributes)
 {
     var higher = null;
     var lower = null;
@@ -1309,9 +1521,20 @@ chronomation.priorityClass = function()
         peers = value;
     };
     
+    if(typeof(attributes) == "object")
+    {
+        for(key in attributes)
+        {
+            if(typeof(this["put_" + key]) == "function")
+            {
+                this["put_" + key](attributes[key]);
+            }
+        }
+    }
+    
 };
 
-chronomation.par = function()
+chronomation.par = function(attributes)
 {
     var accelerate = null;
     var activeElements = null;
@@ -1511,9 +1734,20 @@ chronomation.par = function()
         
     };
     
+    if(typeof(attributes) == "object")
+    {
+        for(key in attributes)
+        {
+            if(typeof(this["put_" + key]) == "function")
+            {
+                this["put_" + key](attributes[key]);
+            }
+        }
+    }
+    
 };
 
-chronomation.seq = function()
+chronomation.seq = function(attributes)
 {
     var accelerate = null;
     var activeElements = null;
@@ -1735,9 +1969,20 @@ chronomation.seq = function()
         
     };
     
+    if(typeof(attributes) == "object")
+    {
+        for(key in attributes)
+        {
+            if(typeof(this["put_" + key]) == "function")
+            {
+                this["put_" + key](attributes[key]);
+            }
+        }
+    }
+    
 };
 
-chronomation.time2 = function()
+chronomation.time2 = function(attributes)
 {
     var accelerate = null;
     var autoReverse = null;
@@ -1941,9 +2186,17 @@ chronomation.time2 = function()
         
     };
     
+    if(typeof(attributes) == "object")
+    {
+        for(key in attributes)
+        {
+            if(typeof(this["put_" + key]) == "function")
+            {
+                this["put_" + key](attributes[key]);
+            }
+        }
+    }
+    
 };
 
-
-
 //</script>
-
