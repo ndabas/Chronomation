@@ -1,0 +1,2 @@
+@"C:\Documents and Settings\Nikhil Dabas\My Documents\My Projects\Scripting\classgen\ClassGen.js" "C:\Documents and Settings\Nikhil Dabas\My Documents\My Projects\Scripting\classgen\chronomation.xml" > chronclasses.js
+@pause
